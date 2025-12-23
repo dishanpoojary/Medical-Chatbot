@@ -18,13 +18,13 @@
         }
         
         .chat-container {
-            height: 500px;
+            height: 70vh; /* Increased height */
             overflow-y: auto;
             scroll-behavior: smooth;
         }
         
         .chat-container::-webkit-scrollbar {
-            width: 6px;
+            width: 8px;
         }
         
         .chat-container::-webkit-scrollbar-track {
@@ -35,6 +35,10 @@
         .chat-container::-webkit-scrollbar-thumb {
             background: #667eea;
             border-radius: 10px;
+        }
+        
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
         
         .message-enter {
@@ -86,6 +90,10 @@
         .feature-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+        .user-message-bubble {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* This is purple gradient, not white */
+}
         
         .feature-card:hover {
             transform: translateY(-5px);
@@ -96,12 +104,80 @@
             min-height: 60vh;
         }
         
-        .bot-message {
-            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        .bot-message-bg {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-left: 4px solid #667eea;
         }
         
-        .user-message {
+        .user-message-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .hero-image {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        
+        /* Message styling improvements */
+        .message-content {
+            line-height: 1.6;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+        }
+        
+        .bot-message-content {
+            font-size: 15px;
+            color: #1f2937;
+        }
+        
+        .user-message-content {
+            font-size: 15px;
+            color: white;
+        }
+        
+        /* Improved message bubbles */
+        .message-bubble {
+            max-width: 75%;
+            border-radius: 18px;
+            padding: 12px 16px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .bot-message-bubble {
+            border-top-left-radius: 4px;
+            background: white;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .user-message-bubble {
+            border-top-right-radius: 4px;
+            color: white;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .message-bubble {
+                max-width: 85%;
+            }
+            
+            .chat-container {
+                height: 60vh;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .message-bubble {
+                max-width: 90%;
+            }
         }
     </style>
 </head>
@@ -136,7 +212,7 @@
                     </a>
                 </div>
                 <div class="hidden md:block">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2833/2833872.png" alt="Medical AI" class="w-full max-w-md mx-auto">
+                    <img src="https://cdn-icons-png.flaticon.com/512/8927/8927817.png" alt="Medical AI Assistant" class="w-full max-w-md mx-auto hero-image">
                 </div>
             </div>
         </div>
@@ -178,22 +254,24 @@
         </div>
     </section>
 
-    <!-- Chat Section -->
+    <!-- Chat Section - NOW TAKES 80% OF SCREEN -->
     <section id="chat" class="py-20 bg-gray-50">
-        <div class="container mx-auto px-4">
-            <div class="max-w-4xl mx-auto">
-                <div class="text-center mb-8">
-                    <h2 class="text-4xl font-bold text-gray-800 mb-4">Chat with MediBot</h2>
-                    <p class="text-gray-600">Ask any medical question about human anatomy, symptoms, or health concerns</p>
-                </div>
-                
-                <!-- Chat Interface -->
-                <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-                    <!-- Chat Header -->
-                    <div class="gradient-bg text-white p-6">
+        <div class="w-4/5 mx-auto px-4"> <!-- Changed from max-w-4xl to w-4/5 (80%) -->
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">Chat with MediBot</h2>
+                <p class="text-gray-600">Ask any medical question about human anatomy, symptoms, or health concerns</p>
+            </div>
+            
+            <!-- Chat Interface - Full width of 80% container -->
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                <!-- Chat Header -->
+                <div class="gradient-bg text-white p-6">
+                    <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-4">
                             <div class="relative">
-                                <img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" alt="Bot" class="w-14 h-14 rounded-full border-2 border-white">
+                                <div class="w-14 h-14 rounded-full border-4 border-white bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                                    <i class="fas fa-robot text-2xl text-white"></i>
+                                </div>
                                 <span class="absolute bottom-0 right-0 w-4 h-4 bg-green-400 rounded-full border-2 border-white"></span>
                             </div>
                             <div>
@@ -201,51 +279,59 @@
                                 <p class="text-purple-200 text-sm">Always here to help</p>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Chat Messages -->
-                    <div id="chatMessages" class="chat-container p-6 bg-gray-50">
-                        <!-- Welcome Message -->
-                        <div class="flex items-start space-x-3 mb-4 message-enter">
-                            <img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" alt="Bot" class="w-10 h-10 rounded-full">
-                            <div class="bg-white rounded-2xl rounded-tl-none p-4 shadow-sm max-w-md">
-                                <p class="text-gray-800">Hello! I'm MediBot, your AI medical assistant. I can help you with questions about human anatomy, medical conditions, symptoms, and general health information. How can I assist you today?</p>
-                                <span class="text-xs text-gray-400 mt-2 block">Just now</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Chat Input -->
-                    <div class="p-6 bg-white border-t">
-                        <div class="flex space-x-3">
-                            <input 
-                                type="text" 
-                                id="messageInput" 
-                                placeholder="Type your medical question here..." 
-                                class="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                required
-                            >
-                            <button 
-                                id="sendButton"
-                                class="bg-purple-600 text-white px-6 py-3 rounded-full hover:bg-purple-700 transition flex items-center space-x-2"
-                            >
-                                <span>Send</span>
-                                <i class="fas fa-paper-plane"></i>
+                        <div class="hidden md:block">
+                            <button id="clearChat" class="text-white hover:text-purple-200 transition text-sm">
+                                <i class="fas fa-trash-alt mr-1"></i> Clear Chat
                             </button>
-                        </div>
-                        <div class="mt-3">
-                            <p class="text-xs text-gray-500">Try asking: "What is the function of the heart?" or "Explain human respiratory system"</p>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Disclaimer -->
-                <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p class="text-sm text-yellow-800 flex items-center">
-                        <i class="fas fa-exclamation-triangle mr-2"></i>
-                        <strong>Disclaimer:</strong> MediBot provides information for educational purposes only. Always consult with a healthcare professional for medical advice, diagnosis, or treatment.
-                    </p>
+                <!-- Chat Messages - Much wider now -->
+                <div id="chatMessages" class="chat-container p-6 bg-gray-50">
+                    <!-- Welcome Message -->
+                    <div class="flex items-start space-x-3 mb-4 message-enter">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
+                            <i class="fas fa-robot text-white"></i>
+                        </div>
+                        <div class="bot-message-bubble message-bubble">
+                            <p class="bot-message-content">Hello! 👋 I'm MediBot, your AI medical assistant. I can help you with questions about human anatomy, medical conditions, symptoms, and general health information. How can I assist you today?</p>
+                            <span class="text-xs text-gray-400 mt-2 block">Just now</span>
+                        </div>
+                    </div>
                 </div>
+                
+                <!-- Chat Input -->
+                <div class="p-6 bg-white border-t">
+                    <div class="flex space-x-3">
+                        <input 
+                            type="text" 
+                            id="messageInput" 
+                            placeholder="Type your medical question here..." 
+                            class="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            required
+                        >
+                        <button 
+                            id="sendButton"
+                            class="bg-purple-600 text-white px-6 py-3 rounded-full hover:bg-purple-700 transition flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <span>Send</span>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="mt-3 flex justify-between items-center">
+                        <p class="text-xs text-gray-500">Try asking: "What is the function of the heart?" or "Explain human respiratory system"</p>
+                        <p class="text-xs text-gray-400">Press Enter to send</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Disclaimer -->
+            <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p class="text-sm text-yellow-800 flex items-center">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    <strong>Disclaimer:</strong> MediBot provides information for educational purposes only. Always consult with a healthcare professional for medical advice, diagnosis, or treatment.
+                </p>
             </div>
         </div>
     </section>
@@ -290,6 +376,7 @@
             const chatMessages = document.getElementById('chatMessages');
             const messageInput = document.getElementById('messageInput');
             const sendButton = document.getElementById('sendButton');
+            const clearChatButton = document.getElementById('clearChat');
             
             // Auto-scroll to bottom
             function scrollToBottom() {
@@ -304,23 +391,25 @@
                 return `${hours}:${minutes}`;
             }
             
-            // Add user message
+            // Add user message with improved styling
             function addUserMessage(message) {
                 const time = getCurrentTime();
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'flex items-start space-x-3 mb-4 justify-end message-enter';
                 messageDiv.innerHTML = `
-                    <div class="user-message text-white rounded-2xl rounded-tr-none p-4 shadow-sm max-w-md">
-                        <p>${escapeHtml(message)}</p>
-                        <span class="text-xs text-purple-200 mt-2 block">${time}</span>
+                    <div class="user-message-bubble message-bubble">
+                        <p class="user-message-content">${escapeHtml(message)}</p>
+                        <span class="text-xs text-purple-100 mt-2 block">${time}</span>
                     </div>
-                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="User" class="w-10 h-10 rounded-full">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 flex items-center justify-center shrink-0">
+                        <i class="fas fa-user text-black"></i>
+                    </div>
                 `;
                 chatMessages.appendChild(messageDiv);
                 scrollToBottom();
             }
             
-            // Add bot message
+            // Add bot message with improved styling
             function addBotMessage(message) {
                 // Remove typing indicator
                 const typingIndicator = document.querySelector('.typing-indicator-container');
@@ -332,9 +421,11 @@
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'flex items-start space-x-3 mb-4 message-enter';
                 messageDiv.innerHTML = `
-                    <img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" alt="Bot" class="w-10 h-10 rounded-full">
-                    <div class="bg-white rounded-2xl rounded-tl-none p-4 shadow-sm max-w-md">
-                        <p class="text-gray-800">${formatMessage(message)}</p>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
+                        <i class="fas fa-robot text-white"></i>
+                    </div>
+                    <div class="bot-message-bubble message-bubble">
+                        <div class="bot-message-content">${formatMessage(message)}</div>
                         <span class="text-xs text-gray-400 mt-2 block">${time}</span>
                     </div>
                 `;
@@ -347,8 +438,10 @@
                 const typingDiv = document.createElement('div');
                 typingDiv.className = 'flex items-start space-x-3 mb-4 typing-indicator-container';
                 typingDiv.innerHTML = `
-                    <img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" alt="Bot" class="w-10 h-10 rounded-full">
-                    <div class="bg-white rounded-2xl rounded-tl-none p-4 shadow-sm">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
+                        <i class="fas fa-robot text-white"></i>
+                    </div>
+                    <div class="bot-message-bubble message-bubble">
                         <div class="typing-indicator">
                             <span></span>
                             <span></span>
@@ -360,13 +453,39 @@
                 scrollToBottom();
             }
             
-            // Format message (basic markdown support)
+            // Enhanced message formatting with better readability
             function formatMessage(text) {
-                // Convert line breaks to <br>
-                text = escapeHtml(text).replace(/\n/g, '<br>');
+                // Escape HTML first
+                text = escapeHtml(text);
                 
-                // Simple bold formatting
-                text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                // Convert line breaks to <br>
+                text = text.replace(/\n/g, '<br>');
+                
+                // Format bold text
+                text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>');
+                
+                // Format italics
+                text = text.replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
+                
+                // Format lists (simple bullet points)
+                text = text.replace(/^•\s+(.+)$/gm, '<span class="block ml-4">• $1</span>');
+                text = text.replace(/^-\s+(.+)$/gm, '<span class="block ml-4">- $1</span>');
+                
+                // Format numbered lists
+                let listCount = 0;
+                text = text.replace(/^\d+\.\s+(.+)$/gm, function(match, content) {
+                    listCount++;
+                    return `<span class="block ml-4">${listCount}. ${content}</span>`;
+                });
+                
+                // Format section headers (if marked with ###)
+                text = text.replace(/###\s*(.+)/g, '<h4 class="font-bold text-lg mt-3 mb-2 text-purple-700">$1</h4>');
+                
+                // Format paragraph breaks (double line breaks)
+                text = text.replace(/(<br>\s*){2,}/g, '</p><p class="mt-2">');
+                
+                // Wrap in paragraph tags
+                text = '<p class="mb-2">' + text + '</p>';
                 
                 return text;
             }
@@ -382,6 +501,10 @@
             async function sendMessage() {
                 const message = messageInput.value.trim();
                 if (!message) return;
+                
+                // Disable button and input during processing
+                sendButton.disabled = true;
+                messageInput.disabled = true;
                 
                 // Add user message
                 addUserMessage(message);
@@ -410,6 +533,29 @@
                 } catch (error) {
                     console.error('Error:', error);
                     addBotMessage('Sorry, I am having trouble connecting to the server. Please check your connection.');
+                } finally {
+                    // Re-enable button and input
+                    sendButton.disabled = false;
+                    messageInput.disabled = false;
+                    messageInput.focus();
+                }
+            }
+            
+            // Clear chat function
+            function clearChat() {
+                if (confirm('Are you sure you want to clear the chat history?')) {
+                    // Keep only the welcome message
+                    const welcomeMessage = chatMessages.firstElementChild;
+                    chatMessages.innerHTML = '';
+                    chatMessages.appendChild(welcomeMessage);
+                    
+                    // Add a notification
+                    const notificationDiv = document.createElement('div');
+                    notificationDiv.className = 'text-center py-2 text-sm text-gray-500';
+                    notificationDiv.textContent = 'Chat cleared';
+                    chatMessages.appendChild(notificationDiv);
+                    
+                    scrollToBottom();
                 }
             }
             
@@ -417,9 +563,25 @@
             sendButton.addEventListener('click', sendMessage);
             
             messageInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
+                if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendMessage();
+                }
+            });
+            
+            if (clearChatButton) {
+                clearChatButton.addEventListener('click', clearChat);
+            }
+            
+            // Allow Shift+Enter for new lines in textarea
+            messageInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && e.shiftKey) {
+                    // Allow default behavior (new line)
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (!sendButton.disabled) {
+                        sendMessage();
+                    }
                 }
             });
             
