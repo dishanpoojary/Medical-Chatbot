@@ -1,607 +1,1372 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MediBot - AI Medical Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        * {
-            font-family: 'Inter', sans-serif;
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+      * {
+        font-family: "Inter", sans-serif;
+      }
+
+      .gradient-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      .hero-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-gradient::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+          radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.3) 0%, transparent 50%),
+          radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.3) 0%, transparent 50%);
+        animation: pulse 8s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+      }
+
+      .medical-icon {
+        position: absolute;
+        opacity: 0.1;
+        color: white;
+        animation: float-medical 20s infinite;
+      }
+
+      @keyframes float-medical {
+        0%, 100% {
+          transform: translate(0, 0) rotate(0deg);
         }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        33% {
+          transform: translate(30px, -30px) rotate(120deg);
         }
-        
-        .chat-container {
-            height: 70vh; /* Increased height */
-            overflow-y: auto;
-            scroll-behavior: smooth;
+        66% {
+          transform: translate(-20px, 20px) rotate(240deg);
         }
-        
-        .chat-container::-webkit-scrollbar {
-            width: 8px;
+      }
+
+      .hero-card {
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      }
+
+      .stat-counter {
+        animation: countUp 2s ease-out;
+      }
+
+      @keyframes countUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
         }
-        
-        .chat-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
-        
-        .chat-container::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 10px;
+      }
+
+      .medical-cross {
+        animation: rotate-cross 15s linear infinite;
+      }
+
+      @keyframes rotate-cross {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      .chat-container {
+        height: 75vh;
+        overflow-y: auto;
+        scroll-behavior: smooth;
+      }
+
+      .chat-container::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .chat-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+
+      .chat-container::-webkit-scrollbar-thumb {
+        background: #667eea;
+        border-radius: 10px;
+      }
+
+      .chat-container::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+
+      .message-enter {
+        animation: slideIn 0.3s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
         }
-        
-        .chat-container::-webkit-scrollbar-thumb:hover {
-            background: #555;
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
-        
-        .message-enter {
-            animation: slideIn 0.3s ease-out;
+      }
+
+      .typing-indicator {
+        display: inline-flex;
+        gap: 4px;
+        padding: 10px;
+      }
+
+      .typing-indicator span {
+        width: 8px;
+        height: 8px;
+        background: #667eea;
+        border-radius: 50%;
+        animation: bounce 1.4s infinite;
+      }
+
+      .typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes bounce {
+        0%,
+        60%,
+        100% {
+          transform: translateY(0);
         }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        30% {
+          transform: translateY(-10px);
         }
-        
-        .typing-indicator {
-            display: inline-flex;
-            gap: 4px;
-            padding: 10px;
+      }
+
+      .feature-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .user-message-bubble {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .hero-section {
+        min-height: 60vh;
+      }
+
+      .bot-message-bg {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-left: 4px solid #667eea;
+      }
+
+      .user-message-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      .hero-image {
+        animation: float 6s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
         }
-        
-        .typing-indicator span {
-            width: 8px;
-            height: 8px;
-            background: #667eea;
-            border-radius: 50%;
-            animation: bounce 1.4s infinite;
+        50% {
+          transform: translateY(-20px);
         }
-        
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.2s;
+      }
+
+      .chat-item {
+        transition: all 0.2s ease;
+      }
+
+      .chat-item:hover {
+        background-color: #f3f4f6;
+      }
+
+      @media (max-width: 768px) {
+        .w-1\/4 {
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          z-index: 50;
+          width: 280px !important;
+          box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         }
-        
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.4s;
+
+        .w-1\/4.hidden {
+          display: none;
         }
-        
-        @keyframes bounce {
-            0%, 60%, 100% {
-                transform: translateY(0);
-            }
-            30% {
-                transform: translateY(-10px);
-            }
+
+        .w-3\/4.w-full {
+          width: 100% !important;
         }
-        
-        .feature-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .user-message-bubble {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    /* This is purple gradient, not white */
-}
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-        
-        .hero-section {
-            min-height: 60vh;
-        }
-        
-        .bot-message-bg {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-left: 4px solid #667eea;
-        }
-        
-        .user-message-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .hero-image {
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
-        }
-        
-        /* Message styling improvements */
-        .message-content {
-            line-height: 1.6;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            max-width: 100%;
-        }
-        
-        .bot-message-content {
-            font-size: 15px;
-            color: #1f2937;
-        }
-        
-        .user-message-content {
-            font-size: 15px;
-            color: white;
-        }
-        
-        /* Improved message bubbles */
+      }
+
+      #chatHistory::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      #chatHistory::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+
+      #chatHistory::-webkit-scrollbar-thumb {
+        background: #c7d2fe;
+        border-radius: 10px;
+      }
+
+      #chatHistory::-webkit-scrollbar-thumb:hover {
+        background: #a5b4fc;
+      }
+
+      .chat-item.active {
+        background-color: #eef2ff;
+        border-left: 4px solid #667eea;
+      }
+
+      .delete-chat-btn {
+        transition: transform 0.2s ease;
+      }
+
+      .delete-chat-btn:hover {
+        transform: scale(1.1);
+      }
+
+      .message-content {
+        line-height: 1.6;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
+      }
+
+      .bot-message-content {
+        font-size: 15px;
+        color: #1f2937;
+      }
+
+      .user-message-content {
+        font-size: 15px;
+        color: white;
+      }
+
+      .message-bubble {
+        max-width: 75%;
+        border-radius: 18px;
+        padding: 12px 16px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .bot-message-bubble {
+        border-top-left-radius: 4px;
+        background: white;
+        border: 1px solid #e5e7eb;
+      }
+
+      .user-message-bubble {
+        border-top-right-radius: 4px;
+        color: white;
+      }
+
+      @media (max-width: 768px) {
         .message-bubble {
-            max-width: 75%;
-            border-radius: 18px;
-            padding: 12px 16px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+          max-width: 85%;
         }
-        
-        .bot-message-bubble {
-            border-top-left-radius: 4px;
-            background: white;
-            border: 1px solid #e5e7eb;
+
+        .chat-container {
+          height: 65vh;
         }
-        
-        .user-message-bubble {
-            border-top-right-radius: 4px;
-            color: white;
+      }
+
+      @media (max-width: 640px) {
+        .message-bubble {
+          max-width: 90%;
         }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .message-bubble {
-                max-width: 85%;
-            }
-            
-            .chat-container {
-                height: 60vh;
-            }
-        }
-        
-        @media (max-width: 640px) {
-            .message-bubble {
-                max-width: 90%;
-            }
-        }
+      }
+
+      .fullscreen-mode {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: 100vh !important;
+        z-index: 9999 !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white;
+      }
+
+      .fullscreen-mode .chat-container {
+        height: calc(100vh - 140px) !important;
+      }
+
+      .fullscreen-mode #chatMessages {
+        height: calc(100vh - 180px);
+        max-height: none;
+      }
+
+      .fullscreen-mode .w-1\/4 {
+        display: none;
+      }
+
+      .fullscreen-mode .w-3\/4 {
+        width: 100% !important;
+      }
+
+      .fullscreen-mode .maximize-btn i {
+        transform: rotate(180deg);
+      }
+
+      .fullscreen-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 9998;
+        display: none;
+      }
+
+      .fullscreen-overlay.active {
+        display: block;
+      }
+
+      .maximize-btn {
+        transition: all 0.3s ease;
+      }
+
+      .maximize-btn:hover {
+        transform: scale(1.1);
+      }
+
+      .chat-section-container {
+        transition: all 0.3s ease;
+      }
+
+      .larger-chat .chat-container {
+        height: 80vh;
+      }
+
+      .larger-chat {
+        min-height: 85vh;
+      }
     </style>
-</head>
-<body class="bg-gray-50">
+  </head>
+  <body class="bg-gray-50">
     <!-- Navigation -->
     <nav class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-4">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-robot text-3xl text-purple-600"></i>
-                    <span class="text-2xl font-bold text-gray-800">MediBot</span>
-                </div>
-                <div class="hidden md:flex space-x-6">
-                    <a href="#home" class="text-gray-600 hover:text-purple-600 transition">Home</a>
-                    <a href="#features" class="text-gray-600 hover:text-purple-600 transition">Features</a>
-                    <a href="#chat" class="text-gray-600 hover:text-purple-600 transition">Chat</a>
-                    <a href="#about" class="text-gray-600 hover:text-purple-600 transition">About</a>
-                </div>
-            </div>
+      <div class="container mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center space-x-2">
+            <i class="fas fa-robot text-3xl text-purple-600"></i>
+            <span class="text-2xl font-bold text-gray-800">MediBot</span>
+          </div>
+          <div class="hidden md:flex space-x-6">
+            <a
+              href="#home"
+              class="text-gray-600 hover:text-purple-600 transition"
+              >Home</a
+            >
+            <a
+              href="#features"
+              class="text-gray-600 hover:text-purple-600 transition"
+              >Features</a
+            >
+            <a
+              href="#chat"
+              class="text-gray-600 hover:text-purple-600 transition"
+              >Chat</a
+            >
+            <a
+              href="#about"
+              class="text-gray-600 hover:text-purple-600 transition"
+              >About</a
+            >
+          </div>
         </div>
+      </div>
     </nav>
 
     <!-- Hero Section -->
-    <section id="home" class="hero-section gradient-bg flex items-center">
-        <div class="container mx-auto px-4">
-            <div class="grid md:grid-cols-2 gap-8 items-center">
-                <div class="text-white">
-                    <h1 class="text-5xl font-bold mb-4">Your AI-Powered Medical Assistant</h1>
-                    <p class="text-xl mb-6 text-purple-100">Get instant answers to your medical questions using advanced RAG technology and trusted medical databases.</p>
-                    <a href="#chat" class="inline-block bg-white text-purple-600 px-8 py-3 rounded-full font-semibold hover:bg-purple-50 transition">
-                        Start Chatting <i class="fas fa-arrow-right ml-2"></i>
-                    </a>
-                </div>
-                <div class="hidden md:block">
-                    <img src="https://cdn-icons-png.flaticon.com/512/8927/8927817.png" alt="Medical AI Assistant" class="w-full max-w-md mx-auto hero-image">
-                </div>
+    <section id="home" class="hero-section hero-gradient flex items-center relative">
+      <!-- Floating Medical Icons Background -->
+      <i class="medical-icon fas fa-heartbeat text-6xl" style="top: 10%; left: 5%;"></i>
+      <i class="medical-icon fas fa-dna text-5xl" style="top: 70%; left: 10%; animation-delay: -5s;"></i>
+      <i class="medical-icon fas fa-stethoscope text-7xl" style="top: 20%; right: 8%; animation-delay: -10s;"></i>
+      <i class="medical-icon fas fa-microscope text-6xl" style="bottom: 15%; right: 12%; animation-delay: -15s;"></i>
+      <i class="medical-icon fas fa-lungs text-5xl" style="top: 50%; left: 15%; animation-delay: -7s;"></i>
+      <i class="medical-icon fas fa-brain text-6xl" style="bottom: 25%; right: 20%; animation-delay: -12s;"></i>
+
+      <div class="container mx-auto p-8 relative z-10">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+          <!-- Left Content -->
+          <div class="text-white">
+            <div class="mb-6">
+              <span class="inline-flex items-center bg-white bg-opacity-20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium">
+                <i class="fas fa-shield-alt mr-2"></i>
+                Trusted Medical AI Assistant
+              </span>
             </div>
+            
+            <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+              Your AI-Powered
+              <span class="block mt-2 bg-clip-text text-transparent bg-gradient-to-r from-cyan-200 to-white">
+                Medical Assistant
+              </span>
+            </h1>
+            
+            <p class="text-xl mb-8 text-purple-100 leading-relaxed">
+              Get instant, evidence-based answers to your medical questions using advanced RAG technology and trusted medical databases. Available 24/7 for your health queries.
+            </p>
+
+            <!-- Stats Row -->
+            <div class="grid grid-cols-3 gap-4 mb-8">
+              <div class="text-center">
+                <div class="text-3xl font-bold stat-counter">24/7</div>
+                <div class="text-sm text-purple-200">Available</div>
+              </div>
+              <div class="text-center">
+                <div class="text-3xl font-bold stat-counter">1000+</div>
+                <div class="text-sm text-purple-200">Topics</div>
+              </div>
+              <div class="text-center">
+                <div class="text-3xl font-bold stat-counter">Instant</div>
+                <div class="text-sm text-purple-200">Responses</div>
+              </div>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-wrap gap-4">
+              <a
+                href="#chat"
+                class="inline-flex items-center bg-white text-purple-600 px-8 py-4 rounded-full font-semibold hover:bg-purple-50 transition transform hover:scale-105 shadow-lg"
+              >
+                <i class="fas fa-comments mr-2"></i>
+                Start Chatting
+                <i class="fas fa-arrow-right ml-2"></i>
+              </a>
+              <a
+                href="#features"
+                class="inline-flex items-center bg-white bg-opacity-10 backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-opacity-20 transition"
+              >
+                <i class="fas fa-info-circle mr-2"></i>
+                Learn More
+              </a>
+            </div>
+          </div>
+
+          <!-- Right Content - Medical Visual -->
+          <div class="hidden md:block relative">
+            <div class="relative">
+              <!-- Central Medical Cross -->
+              <div class="hero-card rounded-3xl p-12 relative">
+                <div class="flex justify-center mb-8">
+                  <div class="w-32 h-32 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-2xl medical-cross">
+                    <i class="fas fa-plus text-white text-6xl"></i>
+                  </div>
+                </div>
+
+                <!-- Medical Icons Grid -->
+                <div class="grid grid-cols-4 gap-4 mb-6">
+                  <div class="bg-gradient-to-br from-red-400 to-pink-400 p-4 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition">
+                    <i class="fas fa-heart text-white text-2xl"></i>
+                  </div>
+                  <div class="bg-gradient-to-br from-blue-400 to-cyan-400 p-4 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition">
+                    <i class="fas fa-lungs text-white text-2xl"></i>
+                  </div>
+                  <div class="bg-gradient-to-br from-purple-400 to-indigo-400 p-4 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition">
+                    <i class="fas fa-brain text-white text-2xl"></i>
+                  </div>
+                  <div class="bg-gradient-to-br from-green-400 to-emerald-400 p-4 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition">
+                    <i class="fas fa-dna text-white text-2xl"></i>
+                  </div>
+                  <div class="bg-gradient-to-br from-yellow-400 to-orange-400 p-4 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition">
+                    <i class="fas fa-bone text-white text-2xl"></i>
+                  </div>
+                  <div class="bg-gradient-to-br from-pink-400 to-rose-400 p-4 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition">
+                    <i class="fas fa-stethoscope text-white text-2xl"></i>
+                  </div>
+                  <div class="bg-gradient-to-br from-indigo-400 to-purple-400 p-4 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition">
+                    <i class="fas fa-microscope text-white text-2xl"></i>
+                  </div>
+                  <div class="bg-gradient-to-br from-teal-400 to-cyan-400 p-4 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition">
+                    <i class="fas fa-user-md text-white text-2xl"></i>
+                  </div>
+                </div>
+
+                <!-- Feature Tags -->
+                <div class="flex flex-wrap gap-2 justify-center">
+                  <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-medium">
+                    RAG Powered
+                  </span>
+                  <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+                    Evidence-Based
+                  </span>
+                  <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
+                    Secure & Private
+                  </span>
+                </div>
+              </div>
+
+              <!-- Floating Pulse Animation -->
+              <div class="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-xl animate-pulse">
+                <i class="fas fa-heartbeat text-white text-2xl"></i>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- Features Section -->
     <section id="features" class="py-20 bg-white">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold text-gray-800 mb-4">Why Choose MediBot?</h2>
-                <p class="text-gray-600 text-lg">Advanced AI technology meets trusted medical knowledge</p>
-            </div>
-            
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="feature-card bg-gray-50 p-8 rounded-xl">
-                    <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-brain text-3xl text-purple-600"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">RAG Technology</h3>
-                    <p class="text-gray-600">Retrieval-Augmented Generation ensures accurate, evidence-based responses from verified medical sources.</p>
-                </div>
-                
-                <div class="feature-card bg-gray-50 p-8 rounded-xl">
-                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-database text-3xl text-blue-600"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Trusted Sources</h3>
-                    <p class="text-gray-600">Information retrieved from PubMed, WHO databases, and clinical guidelines you can trust.</p>
-                </div>
-                
-                <div class="feature-card bg-gray-50 p-8 rounded-xl">
-                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-bolt text-3xl text-green-600"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Instant Responses</h3>
-                    <p class="text-gray-600">Get quick, accurate answers to your medical queries powered by advanced language models.</p>
-                </div>
-            </div>
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-4xl font-bold text-gray-800 mb-4">
+            Why Choose MediBot?
+          </h2>
+          <p class="text-gray-600 text-lg">
+            Advanced AI technology meets trusted medical knowledge
+          </p>
         </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="feature-card bg-gray-50 p-8 rounded-xl">
+            <div
+              class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mb-4"
+            >
+              <i class="fas fa-brain text-3xl text-purple-600"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-3">RAG Technology</h3>
+            <p class="text-gray-600">
+              Retrieval-Augmented Generation ensures accurate, evidence-based
+              responses from verified medical sources.
+            </p>
+          </div>
+
+          <div class="feature-card bg-gray-50 p-8 rounded-xl">
+            <div
+              class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mb-4"
+            >
+              <i class="fas fa-database text-3xl text-blue-600"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-3">Trusted Sources</h3>
+            <p class="text-gray-600">
+              Information retrieved from PubMed, WHO databases, and clinical
+              guidelines you can trust.
+            </p>
+          </div>
+
+          <div class="feature-card bg-gray-50 p-8 rounded-xl">
+            <div
+              class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-4"
+            >
+              <i class="fas fa-bolt text-3xl text-green-600"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-3">Instant Responses</h3>
+            <p class="text-gray-600">
+              Get quick, accurate answers to your medical queries powered by
+              advanced language models.
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- Chat Section - NOW TAKES 80% OF SCREEN -->
-    <section id="chat" class="py-20 bg-gray-50">
-        <div class="w-4/5 mx-auto px-4"> <!-- Changed from max-w-4xl to w-4/5 (80%) -->
-            <div class="text-center mb-8">
-                <h2 class="text-4xl font-bold text-gray-800 mb-4">Chat with MediBot</h2>
-                <p class="text-gray-600">Ask any medical question about human anatomy, symptoms, or health concerns</p>
-            </div>
-            
-            <!-- Chat Interface - Full width of 80% container -->
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-                <!-- Chat Header -->
-                <div class="gradient-bg text-white p-6">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
-                            <div class="relative">
-                                <div class="w-14 h-14 rounded-full border-4 border-white bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                                    <i class="fas fa-robot text-2xl text-white"></i>
-                                </div>
-                                <span class="absolute bottom-0 right-0 w-4 h-4 bg-green-400 rounded-full border-2 border-white"></span>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-semibold">MediBot Assistant</h3>
-                                <p class="text-purple-200 text-sm">Always here to help</p>
-                            </div>
-                        </div>
-                        <div class="hidden md:block">
-                            <button id="clearChat" class="text-white hover:text-purple-200 transition text-sm">
-                                <i class="fas fa-trash-alt mr-1"></i> Clear Chat
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Chat Messages - Much wider now -->
-                <div id="chatMessages" class="chat-container p-6 bg-gray-50">
-                    <!-- Welcome Message -->
-                    <div class="flex items-start space-x-3 mb-4 message-enter">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
-                            <i class="fas fa-robot text-white"></i>
-                        </div>
-                        <div class="bot-message-bubble message-bubble">
-                            <p class="bot-message-content">Hello! 👋 I'm MediBot, your AI medical assistant. I can help you with questions about human anatomy, medical conditions, symptoms, and general health information. How can I assist you today?</p>
-                            <span class="text-xs text-gray-400 mt-2 block">Just now</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Chat Input -->
-                <div class="p-6 bg-white border-t">
-                    <div class="flex space-x-3">
-                        <input 
-                            type="text" 
-                            id="messageInput" 
-                            placeholder="Type your medical question here..." 
-                            class="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            required
-                        >
-                        <button 
-                            id="sendButton"
-                            class="bg-purple-600 text-white px-6 py-3 rounded-full hover:bg-purple-700 transition flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <span>Send</span>
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                    <div class="mt-3 flex justify-between items-center">
-                        <p class="text-xs text-gray-500">Try asking: "What is the function of the heart?" or "Explain human respiratory system"</p>
-                        <p class="text-xs text-gray-400">Press Enter to send</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Disclaimer -->
-            <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p class="text-sm text-yellow-800 flex items-center">
-                    <i class="fas fa-exclamation-triangle mr-2"></i>
-                    <strong>Disclaimer:</strong> MediBot provides information for educational purposes only. Always consult with a healthcare professional for medical advice, diagnosis, or treatment.
-                </p>
-            </div>
+    <!-- Chat Section -->
+    <section id="chat" class="py-20 bg-gray-50 larger-chat">
+      <div class="w-full mx-auto px-4">
+        <div class="text-center mb-8">
+          <h2 class="text-4xl font-bold text-gray-800 mb-4">
+            Chat with MediBot
+          </h2>
+          <p class="text-gray-600">
+            Ask any medical question about human anatomy, symptoms, or health
+            concerns
+          </p>
         </div>
+
+        <!-- Fullscreen overlay -->
+        <div id="fullscreenOverlay" class="fullscreen-overlay"></div>
+
+        <!-- Main Chat Container with Sidebar -->
+        <div
+          id="mainChatContainer"
+          class="flex h-[85vh] bg-white rounded-2xl shadow-xl overflow-hidden chat-section-container"
+        >
+          <!-- Sidebar - 25% width -->
+          <div class="w-1/4 bg-gray-50 border-r border-gray-200 flex flex-col">
+            <!-- Sidebar Header -->
+            <div class="p-4 border-b border-gray-200">
+              <button
+                id="newChatBtn"
+                class="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition flex items-center justify-center space-x-2"
+              >
+                <i class="fas fa-plus"></i>
+                <span>New Chat</span>
+              </button>
+            </div>
+
+            <!-- Chat History List -->
+            <div id="chatHistory" class="flex-1 overflow-y-auto p-4 space-y-2">
+              <!-- Chat items will be loaded here dynamically -->
+              <div class="text-center text-gray-500 py-4">
+                <i class="fas fa-comments text-2xl mb-2"></i>
+                <p>No chat history yet</p>
+              </div>
+            </div>
+
+            <!-- Sidebar Footer -->
+            <div class="p-4 border-t border-gray-200">
+              <div class="flex items-center space-x-3">
+                <div
+                  class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center"
+                >
+                  <i class="fas fa-user text-white text-sm"></i>
+                </div>
+                <span id="userIdentifier" class="text-sm text-gray-600"
+                  >User</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Chat Area - 75% width -->
+          <div class="w-3/4 flex flex-col">
+            <!-- Chat Header -->
+            <div class="gradient-bg text-white p-6">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                  <div class="relative">
+                    <div
+                      class="w-14 h-14 rounded-full border-4 border-white bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center"
+                    >
+                      <i class="fas fa-robot text-2xl text-white"></i>
+                    </div>
+                    <span
+                      class="absolute bottom-0 right-0 w-4 h-4 bg-green-400 rounded-full border-2 border-white"
+                    ></span>
+                  </div>
+                  <div>
+                    <h3 class="text-xl font-semibold">MediBot Assistant</h3>
+                    <p class="text-purple-200 text-sm">Always here to help</p>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                  <button
+                    id="maximizeBtn"
+                    class="maximize-btn text-white hover:text-purple-200 transition text-sm flex items-center space-x-1"
+                    title="Maximize Chat Area"
+                  >
+                    <i class="fas fa-expand"></i>
+                    <span class="hidden md:inline">Maximize</span>
+                  </button>
+                  <button
+                    id="clearCurrentChat"
+                    class="text-white hover:text-purple-200 transition text-sm flex items-center space-x-1"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                    <span class="hidden md:inline">Clear Chat</span>
+                  </button>
+                  <button
+                    id="sidebarToggle"
+                    class="text-white hover:text-purple-200 transition text-sm md:hidden"
+                  >
+                    <i class="fas fa-bars"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chat Messages Container -->
+            <div
+              id="chatMessages"
+              class="flex-1 overflow-y-auto p-6 bg-gray-50 chat-container"
+            >
+              <!-- Welcome Message -->
+              <div class="flex items-start space-x-3 mb-4 message-enter">
+                <div
+                  class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shrink-0"
+                >
+                  <i class="fas fa-robot text-white"></i>
+                </div>
+                <div class="bot-message-bubble message-bubble">
+                  <p class="bot-message-content">
+                    Hello! 👋 I'm MediBot, your AI medical assistant. I can help
+                    you with questions about human anatomy, medical conditions,
+                    symptoms, and general health information. How can I assist
+                    you today?
+                  </p>
+                  <span class="text-xs text-gray-400 mt-2 block">Just now</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="p-6 bg-white border-t">
+              <div class="flex space-x-3">
+                <input
+                  type="text"
+                  id="messageInput"
+                  placeholder="Type your medical question here..."
+                  class="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  required
+                />
+                <button
+                  id="sendButton"
+                  class="bg-purple-600 text-white px-6 py-3 rounded-full hover:bg-purple-700 transition flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span>Send</span>
+                  <i class="fas fa-paper-plane"></i>
+                </button>
+              </div>
+              <div class="mt-3 flex justify-between items-center">
+                <p class="text-xs text-gray-500">
+                  Try asking: "What is the function of the heart?" or "Explain
+                  human respiratory system"
+                </p>
+                <p class="text-xs text-gray-400">Press Enter to send</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p class="text-sm text-yellow-800 flex items-center">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            <strong>Disclaimer:</strong> MediBot provides information for
+            educational purposes only. Always consult with a healthcare
+            professional for medical advice, diagnosis, or treatment.
+          </p>
+        </div>
+      </div>
     </section>
 
     <!-- About Section -->
     <section id="about" class="py-20 bg-white">
-        <div class="container mx-auto px-4">
-            <div class="max-w-3xl mx-auto text-center">
-                <h2 class="text-4xl font-bold text-gray-800 mb-6">About MediBot</h2>
-                <p class="text-gray-600 text-lg mb-4">
-                    MediBot is an advanced medical diagnosis system that leverages Retrieval-Augmented Generation (RAG) technology to provide accurate, evidence-based medical information.
-                </p>
-                <p class="text-gray-600 text-lg">
-                    Our system retrieves relevant medical information from trusted databases and uses state-of-the-art language models to generate clear, comprehensive answers to your medical queries.
-                </p>
-                <div class="mt-8 p-6 bg-gray-50 rounded-xl">
-                    <h3 class="text-xl font-semibold mb-4">Technology Stack</h3>
-                    <div class="flex flex-wrap justify-center gap-4">
-                        <span class="px-4 py-2 bg-purple-100 text-purple-700 rounded-full">Flask Backend</span>
-                        <span class="px-4 py-2 bg-blue-100 text-blue-700 rounded-full">LangChain</span>
-                        <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full">RAG Architecture</span>
-                        <span class="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-full">Pinecone Vector DB</span>
-                    </div>
-                </div>
+      <div class="container mx-auto px-4">
+        <div class="max-w-3xl mx-auto text-center">
+          <h2 class="text-4xl font-bold text-gray-800 mb-6">About MediBot</h2>
+          <p class="text-gray-600 text-lg mb-4">
+            MediBot is an advanced medical diagnosis system that leverages
+            Retrieval-Augmented Generation (RAG) technology to provide accurate,
+            evidence-based medical information.
+          </p>
+          <p class="text-gray-600 text-lg">
+            Our system retrieves relevant medical information from trusted
+            databases and uses state-of-the-art language models to generate
+            clear, comprehensive answers to your medical queries.
+          </p>
+          <div class="mt-8 p-6 bg-gray-50 rounded-xl">
+            <h3 class="text-xl font-semibold mb-4">Technology Stack</h3>
+            <div class="flex flex-wrap justify-center gap-4">
+              <span class="px-4 py-2 bg-purple-100 text-purple-700 rounded-full"
+                >Flask Backend</span
+              >
+              <span class="px-4 py-2 bg-blue-100 text-blue-700 rounded-full"
+                >LangChain</span
+              >
+              <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full"
+                >RAG Architecture</span
+              >
+              <span class="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-full"
+                >Pinecone Vector DB</span
+              >
             </div>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-8">
-        <div class="container mx-auto px-4 text-center">
-            <div class="flex items-center justify-center space-x-2 mb-4">
-                <i class="fas fa-robot text-2xl text-purple-400"></i>
-                <span class="text-xl font-bold">MediBot</span>
-            </div>
-            <p class="text-gray-400">&copy; 2025 MediBot. Powered by RAG Technology.</p>
+      <div class="container mx-auto px-4 text-center">
+        <div class="flex items-center justify-center space-x-2 mb-4">
+          <i class="fas fa-robot text-2xl text-purple-400"></i>
+          <span class="text-xl font-bold">MediBot</span>
         </div>
+        <p class="text-gray-400">
+          &copy; 2025 MediBot. Powered by RAG Technology.
+        </p>
+      </div>
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const chatMessages = document.getElementById('chatMessages');
-            const messageInput = document.getElementById('messageInput');
-            const sendButton = document.getElementById('sendButton');
-            const clearChatButton = document.getElementById('clearChat');
-            
-            // Auto-scroll to bottom
-            function scrollToBottom() {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+      // Global variables
+      let currentChatId = null;
+      let currentUserId = null;
+      let chats = [];
+      let isFullscreen = false;
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Initialize session and load chat history
+        initializeSession();
+
+        // DOM Elements
+        const chatMessages = document.getElementById("chatMessages");
+        const messageInput = document.getElementById("messageInput");
+        const sendButton = document.getElementById("sendButton");
+        const clearChatButton = document.getElementById("clearCurrentChat");
+        const newChatBtn = document.getElementById("newChatBtn");
+        const sidebarToggle = document.getElementById("sidebarToggle");
+        const chatHistory = document.getElementById("chatHistory");
+        const userIdentifier = document.getElementById("userIdentifier");
+        const maximizeBtn = document.getElementById("maximizeBtn");
+        const mainChatContainer = document.getElementById("mainChatContainer");
+        const fullscreenOverlay = document.getElementById("fullscreenOverlay");
+
+        // Initialize session
+        async function initializeSession() {
+          try {
+            const response = await fetch("/api/init");
+            const data = await response.json();
+
+            if (!data.error) {
+              currentUserId = data.user_id;
+              currentChatId = data.current_chat_id;
+              chats = data.chats || [];
+
+              // Update user identifier
+              userIdentifier.textContent = `User ${currentUserId.slice(
+                0,
+                8
+              )}...`;
+
+              // Load chat history
+              if (data.current_chat) {
+                loadChatHistory(data.current_chat);
+              }
+
+              // Load chat list
+              loadChatList();
             }
-            
-            // Get current time
-            function getCurrentTime() {
-                const date = new Date();
-                const hours = date.getHours().toString().padStart(2, '0');
-                const minutes = date.getMinutes().toString().padStart(2, '0');
-                return `${hours}:${minutes}`;
+          } catch (error) {
+            console.error("Error initializing session:", error);
+          }
+        }
+
+        // Load chat history into UI
+        function loadChatHistory(chat) {
+          if (!chat || !chat.messages) return;
+
+          // Clear current messages (keep welcome message)
+          const welcomeMessage = chatMessages.firstElementChild;
+          chatMessages.innerHTML = "";
+          chatMessages.appendChild(welcomeMessage);
+
+          // Add chat messages
+          chat.messages.forEach((msg) => {
+            if (msg.role === "user") {
+              addUserMessage(msg.content, msg.timestamp);
+            } else if (msg.role === "assistant") {
+              addBotMessage(msg.content, msg.timestamp);
             }
-            
-            // Add user message with improved styling
-            function addUserMessage(message) {
-                const time = getCurrentTime();
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'flex items-start space-x-3 mb-4 justify-end message-enter';
-                messageDiv.innerHTML = `
-                    <div class="user-message-bubble message-bubble">
-                        <p class="user-message-content">${escapeHtml(message)}</p>
-                        <span class="text-xs text-purple-100 mt-2 block">${time}</span>
-                    </div>
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 flex items-center justify-center shrink-0">
-                        <i class="fas fa-user text-black"></i>
+          });
+
+          scrollToBottom();
+        }
+
+        // Load chat list in sidebar
+        function loadChatList() {
+          chatHistory.innerHTML = "";
+
+          if (chats.length === 0) {
+            chatHistory.innerHTML = `
+                    <div class="text-center text-gray-500 py-4">
+                        <i class="fas fa-comments text-2xl mb-2"></i>
+                        <p>No chat history yet</p>
                     </div>
                 `;
-                chatMessages.appendChild(messageDiv);
-                scrollToBottom();
-            }
-            
-            // Add bot message with improved styling
-            function addBotMessage(message) {
-                // Remove typing indicator
-                const typingIndicator = document.querySelector('.typing-indicator-container');
-                if (typingIndicator) {
-                    typingIndicator.remove();
-                }
-                
-                const time = getCurrentTime();
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'flex items-start space-x-3 mb-4 message-enter';
-                messageDiv.innerHTML = `
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
-                        <i class="fas fa-robot text-white"></i>
-                    </div>
-                    <div class="bot-message-bubble message-bubble">
-                        <div class="bot-message-content">${formatMessage(message)}</div>
-                        <span class="text-xs text-gray-400 mt-2 block">${time}</span>
-                    </div>
-                `;
-                chatMessages.appendChild(messageDiv);
-                scrollToBottom();
-            }
-            
-            // Add typing indicator
-            function addTypingIndicator() {
-                const typingDiv = document.createElement('div');
-                typingDiv.className = 'flex items-start space-x-3 mb-4 typing-indicator-container';
-                typingDiv.innerHTML = `
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
-                        <i class="fas fa-robot text-white"></i>
-                    </div>
-                    <div class="bot-message-bubble message-bubble">
-                        <div class="typing-indicator">
-                            <span></span>
-                            <span></span>
-                            <span></span>
+            return;
+          }
+
+          chats.forEach((chat) => {
+            const chatItem = document.createElement("div");
+            chatItem.className = `chat-item p-3 rounded-lg cursor-pointer transition ${
+              chat.id === currentChatId
+                ? "bg-purple-100 border-l-4 border-purple-500"
+                : "hover:bg-gray-100"
+            }`;
+            chatItem.dataset.chatId = chat.id;
+
+            // Format time
+            const time = new Date(chat.updated_at).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+
+            chatItem.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <h4 class="font-medium text-gray-800 truncate">${escapeHtml(
+                              chat.title
+                            )}</h4>
+                            <p class="text-xs text-gray-500 mt-1">${time}</p>
                         </div>
+                        <button class="delete-chat-btn text-gray-400 hover:text-red-500 ml-2" data-chat-id="${
+                          chat.id
+                        }">
+                            <i class="fas fa-trash-alt text-xs"></i>
+                        </button>
                     </div>
                 `;
-                chatMessages.appendChild(typingDiv);
-                scrollToBottom();
-            }
-            
-            // Enhanced message formatting with better readability
-            function formatMessage(text) {
-                // Escape HTML first
-                text = escapeHtml(text);
-                
-                // Convert line breaks to <br>
-                text = text.replace(/\n/g, '<br>');
-                
-                // Format bold text
-                text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>');
-                
-                // Format italics
-                text = text.replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
-                
-                // Format lists (simple bullet points)
-                text = text.replace(/^•\s+(.+)$/gm, '<span class="block ml-4">• $1</span>');
-                text = text.replace(/^-\s+(.+)$/gm, '<span class="block ml-4">- $1</span>');
-                
-                // Format numbered lists
-                let listCount = 0;
-                text = text.replace(/^\d+\.\s+(.+)$/gm, function(match, content) {
-                    listCount++;
-                    return `<span class="block ml-4">${listCount}. ${content}</span>`;
-                });
-                
-                // Format section headers (if marked with ###)
-                text = text.replace(/###\s*(.+)/g, '<h4 class="font-bold text-lg mt-3 mb-2 text-purple-700">$1</h4>');
-                
-                // Format paragraph breaks (double line breaks)
-                text = text.replace(/(<br>\s*){2,}/g, '</p><p class="mt-2">');
-                
-                // Wrap in paragraph tags
-                text = '<p class="mb-2">' + text + '</p>';
-                
-                return text;
-            }
-            
-            // Escape HTML to prevent XSS
-            function escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
-            
-            // Send message function
-            async function sendMessage() {
-                const message = messageInput.value.trim();
-                if (!message) return;
-                
-                // Disable button and input during processing
-                sendButton.disabled = true;
-                messageInput.disabled = true;
-                
-                // Add user message
-                addUserMessage(message);
-                messageInput.value = '';
-                
-                // Show typing indicator
-                addTypingIndicator();
-                
-                try {
-                    // Send to backend
-                    const response = await fetch('/chat', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ message: message })
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.error) {
-                        addBotMessage('Sorry, I encountered an error. Please try again.');
-                    } else {
-                        addBotMessage(data.response);
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    addBotMessage('Sorry, I am having trouble connecting to the server. Please check your connection.');
-                } finally {
-                    // Re-enable button and input
-                    sendButton.disabled = false;
-                    messageInput.disabled = false;
-                    messageInput.focus();
-                }
-            }
-            
-            // Clear chat function
-            function clearChat() {
-                if (confirm('Are you sure you want to clear the chat history?')) {
-                    // Keep only the welcome message
-                    const welcomeMessage = chatMessages.firstElementChild;
-                    chatMessages.innerHTML = '';
-                    chatMessages.appendChild(welcomeMessage);
-                    
-                    // Add a notification
-                    const notificationDiv = document.createElement('div');
-                    notificationDiv.className = 'text-center py-2 text-sm text-gray-500';
-                    notificationDiv.textContent = 'Chat cleared';
-                    chatMessages.appendChild(notificationDiv);
-                    
-                    scrollToBottom();
-                }
-            }
-            
-            // Event Listeners
-            sendButton.addEventListener('click', sendMessage);
-            
-            messageInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
+
+            chatItem.addEventListener("click", (e) => {
+              if (!e.target.closest(".delete-chat-btn")) {
+                switchToChat(chat.id);
+              }
             });
-            
-            if (clearChatButton) {
-                clearChatButton.addEventListener('click', clearChat);
+
+            chatHistory.appendChild(chatItem);
+          });
+
+          // Add delete event listeners
+          document.querySelectorAll(".delete-chat-btn").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+              e.stopPropagation();
+              const chatId = btn.dataset.chatId;
+              deleteChat(chatId);
+            });
+          });
+        }
+
+        // Switch to a different chat
+        async function switchToChat(chatId) {
+          try {
+            const response = await fetch(`/api/chats/${chatId}/switch`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+
+            const data = await response.json();
+
+            if (!data.error) {
+              currentChatId = chatId;
+              loadChatHistory(data.chat_history);
+              loadChatList(); // Refresh chat list to update active state
             }
-            
-            // Allow Shift+Enter for new lines in textarea
-            messageInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && e.shiftKey) {
-                    // Allow default behavior (new line)
-                } else if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (!sendButton.disabled) {
-                        sendMessage();
-                    }
-                }
+          } catch (error) {
+            console.error("Error switching chat:", error);
+          }
+        }
+
+        // Create new chat
+        async function createNewChat() {
+          try {
+            const response = await fetch("/api/chats/new", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
             });
-            
-            // Smooth scroll for navigation
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        window.scrollTo({
-                            top: target.offsetTop - 70,
-                            behavior: 'smooth'
-                        });
-                    }
-                });
+
+            const data = await response.json();
+
+            if (!data.error) {
+              currentChatId = data.chat_id;
+
+              // Clear chat messages (keep welcome)
+              const welcomeMessage = chatMessages.firstElementChild;
+              chatMessages.innerHTML = "";
+              chatMessages.appendChild(welcomeMessage);
+
+              // Refresh chat list
+              await fetchChats();
+            }
+          } catch (error) {
+            console.error("Error creating new chat:", error);
+          }
+        }
+
+        // Delete a chat
+        async function deleteChat(chatId) {
+          if (!confirm("Are you sure you want to delete this chat?")) return;
+
+          try {
+            const response = await fetch(`/api/chats/${chatId}/delete`, {
+              method: "DELETE",
             });
-            
-            // Focus on input
+
+            const data = await response.json();
+
+            if (!data.error) {
+              // Refresh chat list
+              await fetchChats();
+
+              // If we deleted the current chat, create a new one
+              if (chatId === currentChatId) {
+                await createNewChat();
+              }
+            }
+          } catch (error) {
+            console.error("Error deleting chat:", error);
+          }
+        }
+
+        // Fetch updated chat list
+        async function fetchChats() {
+          try {
+            const response = await fetch("/api/chats");
+            const data = await response.json();
+
+            if (!data.error) {
+              chats = data.chats || [];
+              loadChatList();
+            }
+          } catch (error) {
+            console.error("Error fetching chats:", error);
+          }
+        }
+
+        // Toggle fullscreen mode
+        function toggleFullscreen() {
+          isFullscreen = !isFullscreen;
+
+          if (isFullscreen) {
+            // Enter fullscreen mode
+            mainChatContainer.classList.add("fullscreen-mode");
+            fullscreenOverlay.classList.add("active");
+            maximizeBtn.innerHTML =
+              '<i class="fas fa-compress"></i><span class="hidden md:inline"> Minimize</span>';
+            maximizeBtn.title = "Minimize Chat Area";
+
+            // Hide other page sections
+            document.querySelector("nav").style.display = "none";
+            document.getElementById("home").style.display = "none";
+            document.getElementById("features").style.display = "none";
+            document.getElementById("about").style.display = "none";
+            document.querySelector("footer").style.display = "none";
+
+            // Add escape key listener
+            document.addEventListener("keydown", handleEscapeKey);
+          } else {
+            // Exit fullscreen mode
+            mainChatContainer.classList.remove("fullscreen-mode");
+            fullscreenOverlay.classList.remove("active");
+            maximizeBtn.innerHTML =
+              '<i class="fas fa-expand"></i><span class="hidden md:inline"> Maximize</span>';
+            maximizeBtn.title = "Maximize Chat Area";
+
+            // Show other page sections
+            document.querySelector("nav").style.display = "flex";
+            document.getElementById("home").style.display = "flex";
+            document.getElementById("features").style.display = "block";
+            document.getElementById("about").style.display = "block";
+            document.querySelector("footer").style.display = "block";
+
+            // Remove escape key listener
+            document.removeEventListener("keydown", handleEscapeKey);
+          }
+
+          // Scroll to bottom after resizing
+          setTimeout(scrollToBottom, 100);
+        }
+
+        // Handle escape key to exit fullscreen
+        function handleEscapeKey(event) {
+          if (event.key === "Escape" && isFullscreen) {
+            toggleFullscreen();
+          }
+        }
+
+        // Event Listeners
+        newChatBtn.addEventListener("click", createNewChat);
+        maximizeBtn.addEventListener("click", toggleFullscreen);
+
+        // Clear current chat
+        if (clearChatButton) {
+          clearChatButton.addEventListener("click", async function () {
+            if (confirm("Are you sure you want to clear the current chat?")) {
+              await createNewChat();
+            }
+          });
+        }
+
+        // Toggle sidebar on mobile
+        if (sidebarToggle) {
+          sidebarToggle.addEventListener("click", function () {
+            document.querySelector(".w-1\\/4").classList.toggle("hidden");
+            document.querySelector(".w-3\\/4").classList.toggle("w-full");
+          });
+        }
+
+        // Auto-scroll to bottom
+        function scrollToBottom() {
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Get current time
+        function getCurrentTime() {
+          const date = new Date();
+          const hours = date.getHours().toString().padStart(2, "0");
+          const minutes = date.getMinutes().toString().padStart(2, "0");
+          return `${hours}:${minutes}`;
+        }
+
+        // Add user message with improved styling
+        function addUserMessage(message, timestamp = null) {
+          const time = timestamp ? formatTime(timestamp) : getCurrentTime();
+          const messageDiv = document.createElement("div");
+          messageDiv.className =
+            "flex items-start space-x-3 mb-4 justify-end message-enter";
+          messageDiv.innerHTML = `
+                <div class="user-message-bubble message-bubble">
+                    <p class="user-message-content">${escapeHtml(message)}</p>
+                    <span class="text-xs text-purple-100 mt-2 block">${time}</span>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 flex items-center justify-center shrink-0">
+                    <i class="fas fa-user text-black"></i>
+                </div>
+            `;
+          chatMessages.appendChild(messageDiv);
+          scrollToBottom();
+        }
+
+        // Add bot message with improved styling
+        function addBotMessage(message, timestamp = null) {
+          // Remove typing indicator
+          const typingIndicator = document.querySelector(
+            ".typing-indicator-container"
+          );
+          if (typingIndicator) {
+            typingIndicator.remove();
+          }
+
+          const time = timestamp ? formatTime(timestamp) : getCurrentTime();
+          const messageDiv = document.createElement("div");
+          messageDiv.className =
+            "flex items-start space-x-3 mb-4 message-enter";
+          messageDiv.innerHTML = `
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
+                    <i class="fas fa-robot text-white"></i>
+                </div>
+                <div class="bot-message-bubble message-bubble">
+                    <div class="bot-message-content">${formatMessage(
+                      message
+                    )}</div>
+                    <span class="text-xs text-gray-400 mt-2 block">${time}</span>
+                </div>
+            `;
+          chatMessages.appendChild(messageDiv);
+          scrollToBottom();
+        }
+
+        // Format timestamp
+        function formatTime(timestamp) {
+          const date = new Date(timestamp);
+          return date.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        }
+
+        // Add typing indicator
+        function addTypingIndicator() {
+          const typingDiv = document.createElement("div");
+          typingDiv.className =
+            "flex items-start space-x-3 mb-4 typing-indicator-container";
+          typingDiv.innerHTML = `
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
+                    <i class="fas fa-robot text-white"></i>
+                </div>
+                <div class="bot-message-bubble message-bubble">
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            `;
+          chatMessages.appendChild(typingDiv);
+          scrollToBottom();
+        }
+
+        // Enhanced message formatting with better readability
+        function formatMessage(text) {
+          // First, escape HTML to prevent XSS
+          text = escapeHtml(text);
+
+          // Preserve line breaks by converting \n to <br>
+          text = text.replace(/\n/g, "<br>");
+
+          // Handle bullet points (multiple formats)
+          text = text.replace(/^<br>\s*•\s*/gm, "• ");
+          text = text.replace(
+            /^•\s+(.+?)(<br>|$)/gm,
+            '<div class="flex items-start mb-1"><span class="mr-2 mt-1">•</span><span>$1</span></div>$2'
+          );
+
+          // Handle numbered lists
+          text = text.replace(
+            /^(\d+)\.\s+(.+?)(<br>|$)/gm,
+            '<div class="flex items-start mb-1"><span class="mr-2 font-medium">$1.</span><span>$2</span></div>$3'
+          );
+
+          // Handle bold text
+          text = text.replace(
+            /\*\*(.*?)\*\*/g,
+            '<strong class="font-semibold text-gray-800">$1</strong>'
+          );
+
+          // Handle section headers
+          text = text.replace(
+            /###\s+(.+?)<br>/g,
+            '<h3 class="font-bold text-lg mt-4 mb-2 text-purple-700">$1</h3>'
+          );
+          text = text.replace(
+            /##\s+(.+?)<br>/g,
+            '<h2 class="font-bold text-xl mt-4 mb-3 text-purple-800 border-b pb-1">$1</h2>'
+          );
+
+          // Handle disclaimers specially
+          text = text.replace(
+            /⚠️\s*\*\*Disclaimer\*\*:(.+?)<br>/g,
+            '<div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg"><p class="text-sm text-yellow-800 flex items-start"><i class="fas fa-exclamation-triangle mr-2 mt-0.5"></i><span><strong>Disclaimer:</strong>$1</span></p></div>'
+          );
+
+          // Add proper paragraph spacing
+          text = text.replace(/(<br>\s*){2,}/g, '</p><p class="mb-3">');
+
+          // Wrap in paragraph if needed
+          if (!text.startsWith("<h") && !text.startsWith("<div")) {
+            text = '<p class="mb-3">' + text + "</p>";
+          }
+
+          return text;
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+          const div = document.createElement("div");
+          div.textContent = text;
+          return div.innerHTML;
+        }
+
+        // Send message function (updated for new endpoint)
+        async function sendMessage() {
+          const message = messageInput.value.trim();
+          if (!message) return;
+
+          // Disable button and input during processing
+          sendButton.disabled = true;
+          messageInput.disabled = true;
+
+          // Add user message
+          addUserMessage(message);
+          messageInput.value = "";
+
+          // Show typing indicator
+          addTypingIndicator();
+
+          try {
+            // Send to backend
+            const response = await fetch("/api/chat", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ message: message }),
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+              addBotMessage("Sorry, I encountered an error. Please try again.");
+            } else {
+              addBotMessage(data.response);
+              // Refresh chat list to show updated title
+              await fetchChats();
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            addBotMessage(
+              "Sorry, I am having trouble connecting to the server. Please check your connection."
+            );
+          } finally {
+            // Re-enable button and input
+            sendButton.disabled = false;
+            messageInput.disabled = false;
             messageInput.focus();
+          }
+        }
+
+        // Event Listeners for sending messages
+        sendButton.addEventListener("click", sendMessage);
+
+        messageInput.addEventListener("keypress", function (e) {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+          }
         });
+
+        // Allow Shift+Enter for new lines in textarea
+        messageInput.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" && e.shiftKey) {
+            // Allow default behavior (new line)
+          } else if (e.key === "Enter") {
+            e.preventDefault();
+            if (!sendButton.disabled) {
+              sendMessage();
+            }
+          }
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+          anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute("href"));
+            if (target) {
+              window.scrollTo({
+                top: target.offsetTop - 70,
+                behavior: "smooth",
+              });
+            }
+          });
+        });
+
+        // Focus on input
+        messageInput.focus();
+      });
     </script>
-</body>
+  </body>
 </html>

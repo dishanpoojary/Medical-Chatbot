@@ -10,3 +10,6 @@ pinecone
 flask-cors==5.0.0
 langchain-huggingface
 langchain-core
+flask-sqlalchemy
+flask-session
+redis
